@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>world.search (you); — B站简介</title>
+<style>
+  :root{
+    --bg:#0a0c10; --panel:#11151c; --line:#2a3340; --dim:#8b96a5;
+    --wh:#e8eef4; --cy:#5ee0a0; --go:#ffc94a; --pu:#b98cff; --bl:#78aaff; --rd:#ff6a5e;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--wh);
+    font:14px/1.85 ui-monospace,"Cascadia Mono",Consolas,"Microsoft YaHei",monospace;
+    padding:34px 22px 80px;
+  }
+  .wrap{max-width:880px;margin:0 auto}
+  h1{font-size:19px;letter-spacing:.5px;margin:0 0 4px;color:var(--wh)}
+  h1 b{color:var(--cy)}
+  .sub{color:var(--dim);font-size:12px;margin-bottom:26px}
+  h2{
+    font-size:13px;color:var(--go);letter-spacing:1px;margin:30px 0 10px;
+    border-left:3px solid var(--go);padding-left:9px;font-weight:600;
+  }
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:2px;
+    padding:18px 20px;white-space:pre-wrap;word-break:break-word;
+    font-size:13.5px;line-height:2.05;
+  }
+  .card.edit{outline:1px dashed var(--cy);outline-offset:3px}
+  .bar{display:flex;gap:8px;align-items:center;margin:10px 0 0}
+  button{
+    background:#1a2130;color:var(--wh);border:1px solid var(--line);
+    padding:5px 13px;border-radius:2px;font:12px/1.4 inherit;cursor:pointer;
+  }
+  button:hover{border-color:var(--cy);color:var(--cy)}
+  button.on{border-color:var(--go);color:var(--go)}
+  .tag{color:var(--dim);font-size:12px;margin-left:auto}
+  .tags span{
+    display:inline-block;border:1px solid var(--line);padding:2px 9px;margin:0 6px 6px 0;
+    border-radius:2px;color:var(--bl);font-size:12px;
+  }
+  .note{color:var(--dim);font-size:12px;line-height:1.9;margin-top:8px}
+  .note b{color:var(--pu)}
+  .hint{
+    position:fixed;left:0;right:0;bottom:0;background:rgba(10,12,16,.94);
+    border-top:1px solid var(--line);padding:7px 16px;color:var(--dim);font-size:11.5px;
+    text-align:center;letter-spacing:.3px;
+  }
+  .hint b{color:var(--go)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>world.search (you); <b>— B站简介</b></h1>
+  <div class="sub">Mili · 全片由 WebGL 代码实时生成</div>
+
+  <h2>标题备选</h2>
+  <div class="card" id="titles"></div>
+  <div class="bar"><button data-copy="titles">复制标题</button><span class="tag">主推第一条</span></div>
+
+  <h2>简介 · 完整版</h2>
+  <div class="card" id="full"></div>
+  <div class="bar"><button data-copy="full">复制完整版</button></div>
+
+  <h2>简介 · 短版</h2>
+  <div class="card" id="short"></div>
+  <div class="bar"><button data-copy="short">复制短版</button></div>
+
+  <h2>标签</h2>
+  <div class="tags" id="tags"></div>
+
+  <h2>开写之前你可能想改的地方</h2>
+  <div class="note">
+    · 全部文案都在本文件底部的 <b>const TEXT</b> 里，改完存盘刷新即可，没有任何依赖。<br>
+    · 想先看效果再改，可以点下面的「编辑模式」，直接在页面上改字，改完点复制。<br>
+    · 页面样式也都在顶部一段 CSS 里，配色变量集中在 <b>:root</b>。
+  </div>
+</div>
+
+<div class="hint">
+  文案在文件底部的 <b>const TEXT</b> · 点「编辑模式」可当场改字并复制
+  <button id="editBtn" style="margin-left:10px">编辑模式</button>
+</div>
+
+<script>
+/* ==========================================================================
+   ↓↓↓  要改的字全在这里  ↓↓↓
+   每一段都是普通字符串，换行直接回车即可，注意别删掉结尾的引号和逗号。
+   ========================================================================== */
+const TEXT = {
+
+  titles:
+`《world.search (you);》纯代码MV｜我搜遍所有形态，才找到那个词
+
+world.search (you);｜我搜遍万物，只为找到你
+
+《world.search (you);》纯代码MV
+
+用代码搜了你 4 分 55 秒，最后搜到的是"爱"
+
+【纯代码生成】world.search (you); — 每一次变形，都是一次搜索`,
+
+  full:
+`「如果你变成一张桌子，
+　你必须正好是我的手肘那么高。」
+
+这是《world.execute (me);》的姊妹篇，也是它的镜像。
+
+上一首里，是她在请求你：执行我吧，测试我吧，你想让我变成什么都可以——
+茄子、番茄、猫、神、换个性别，都行。
+那是她讨好你的方式。
+
+这一首反过来了。
+现在是她来找你。
+
+桌子、茄子、猫、牛排、花、人类、小狗……
+她把每一种形态都试了一遍，每一次都得到同一个结论：
+"You're the only perfect X for me."
+——不管那是什么，只要是你就完美。
+
+可问题在于，你从来没有停下来。
+"somehow you can't stop transforming"
+她一次次搜到了你，又一次次认不出你。
+
+于是她开始找那个词。
+
+"如果我是一片纸……你必须是……U-Um？"
+"What, what's it called?"
+"What's that word again?"
+"Do-o-o-o-ope"？
+"Lo-o-o-ove"？
+
+——她要找的那个词，念出来的时候是 Love。
+
+「每个人都有一个装爱的桶，
+　有的空着，有的装满了。
+　把它切碎，拆到细胞，
+　再拼回来，我们已经不一样了。」
+
+整首歌最疼的一句藏在副歌后面：
+"My old self that's gone since you have left"
+她搜索的不只是你。
+还有你离开以后，那个已经不见了的、原来的自己。
+
+献给每一个还在搜索框里打字的人。
+
+────────────
+Mili — world.search (you);
+全片由 WebGL 代码实时生成，无手绘素材
+画面中的每一次形态变换都对应歌里的一次搜索`,
+
+  short:
+`《world.execute (me);》的镜像篇。
+
+上一首是她说：执行我吧，你想让我变成什么都行。
+这一首是她在问：你在哪？
+
+桌子、茄子、猫、牛排、花、人类……
+她把所有形态都搜了一遍，每次都得到同一句
+"You're the only perfect X for me"。
+
+可她找不到那个词。
+"What's that word again?"
+"Lo-o-o-ove"。
+
+她搜的其实不只是你，
+还有你走了以后，那个已经不见了的自己。
+
+全片由 WebGL 代码实时生成。`,
+
+  tags: ["Mili", "world.search(you)", "world.execute(me)", "代码MV", "WebGL", "音乐可视化", "纯代码生成"]
+};
+/* ==========================================================================
+   ↑↑↑  要改的字全在上面  ↑↑↑
+   ========================================================================== */
+
+const $ = (id) => document.getElementById(id);
+
+function paint() {
+  $("titles").textContent = TEXT.titles;
+  $("full").textContent = TEXT.full;
+  $("short").textContent = TEXT.short;
+  $("tags").innerHTML = TEXT.tags.map((t) => "<span>" + t + "</span>").join("");
+}
+paint();
+
+// copy buttons
+document.querySelectorAll("[data-copy]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const el = $(btn.dataset.copy);
+    const txt = el.textContent;
+    const done = () => { const o = btn.textContent; btn.textContent = "已复制 ✓";
+      setTimeout(() => { btn.textContent = o; }, 1200); };
+    if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, done);
+    else { const ta = document.createElement("textarea"); ta.value = txt;
+      document.body.appendChild(ta); ta.select(); document.execCommand("copy");
+      ta.remove(); done(); }
+  });
+});
+
+// edit mode: change the words right on the page, then copy
+let editing = false;
+$("editBtn").addEventListener("click", () => {
+  editing = !editing;
+  $("editBtn").classList.toggle("on", editing);
+  $("editBtn").textContent = editing ? "退出编辑" : "编辑模式";
+  ["titles", "full", "short"].forEach((id) => {
+    const el = $(id);
+    el.contentEditable = editing ? "true" : "false";
+    el.classList.toggle("edit", editing);
+  });
+  if (!editing) {           // write the edits back into TEXT so a copy keeps them
+    TEXT.titles = $("titles").textContent;
+    TEXT.full = $("full").textContent;
+    TEXT.short = $("short").textContent;
+  }
+});
+</script>
+</body>
+</html>

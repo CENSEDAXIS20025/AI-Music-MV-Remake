@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>world.search(you); — chat overlay (dark)</title>
+<script>
+  // Resolve the theme before anything paints (no dark flash on the paper page).
+  // This entry is the dark one; ?theme=light|dark overrides it so a batch
+  // capture can render either look from the same file.
+  (function () {
+    var light = window.WEM_THEME === "light";
+    try {
+      var q = new URLSearchParams(location.search);
+      if (q.has("theme")) light = q.get("theme") === "light";
+    } catch (e) { }
+    window.WEM_THEME = light ? "light" : "dark";
+    if (light) document.documentElement.className = "wem-light";
+  })();
+</script>
+<style>
+  html,body{margin:0;padding:0;background:#000;overflow:hidden;width:100%;height:100%;
+            font-family:"Cascadia Mono",Consolas,monospace;color:#cfd6de}
+  #gl{display:block;width:100vw;height:100vh}
+  #start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+         background:rgba(8,10,14,.88);border:1px solid rgba(53,224,255,.55);color:#eef2f6;
+         padding:22px 34px;font:600 16px/1.5 "Cascadia Mono",Consolas,monospace;cursor:pointer;
+         letter-spacing:1px;text-align:center;z-index:9}
+  #start:hover{border-color:#ffc94a;color:#ffc94a}
+  #start small{display:block;margin-top:8px;color:#7f8892;font-weight:400;letter-spacing:0}
+  /* ---- paper theme: the same chrome printed instead of lit ---- */
+  html.wem-light,html.wem-light body{background:#f1efe8;color:#2b323a}
+  html.wem-light #start{background:rgba(252,251,247,.94);border-color:rgba(0,130,160,.6);color:#1b2128;
+                        box-shadow:0 8px 30px rgba(40,44,50,.16)}
+  html.wem-light #start:hover{border-color:#a8651a;color:#a8651a}
+  html.wem-light #start small{color:#6d757e}
+</style>
+</head>
+<body>
+<canvas id="gl" width="1920" height="1080"></canvas>
+<button id="start">▶START PLAYBACK<small>world.search(you); —Mili · chat overlay<br>audio + realtime rendered visuals</small></button>
+
+<script src="src/00_core.js"></script>
+<script src="src/10_render.js"></script>
+<script src="src/20_hud.js"></script>
+<script src="src/25_viz.js"></script>
+<script src="src/26_lab.js"></script>
+<script src="src/27_sui.js"></script>
+<script src="src/30_data.js"></script>
+<script src="src/50_audiobar.js"></script>
+<script src="src/40_main.js"></script>
+<script src="src/sections/a_01_05.js"></script>
+<script src="src/sections/b_06_10.js"></script>
+<script src="src/sections/c_11_15.js"></script>
+<script src="src/sections/d_16_22.js"></script>
+<!-- the chat overlay: the TUI toolkit and the dsh window copied from the
+     previous film, plus this song's transcript and the draw hook -->
+<script src="src/60_tui.js"></script>
+<script src="src/61_gadgets.js"></script>
+<script src="src/70_chat.js"></script>
+<script>
+(function(){
+  var play = !new URLSearchParams(location.search).has("render");
+  window.WEM_AB_GAIN = 0.80;
+  window.WEM_AB_EXPO = 0.50;
+  window.WEM_AB_MUL = 1.55;
+  window.WEM_BANDS_GAIN = 0.30;
+  window.WEM.boot({ mode: play ? "play" : "render" }).then(function(app){
+    // The chat window lives in the HUD layer and must be painted before
+    // App.frame() uploads that canvas to a texture, or it lands one frame
+    // late (and never, in ?render still mode). install() wraps frame() and
+    // defers the upload, so not one of the 22 segment files has to change --
+    // and the plain bundles, which load neither 70_chat.js nor its two
+    // dependencies, are untouched.
+    WEM.Chat.install(app);
+    window.__booted = true;
+    if (!play) { document.getElementById("start").style.display = "none"; }
+    document.addEventListener("keydown", function(e){
+      if (e.key === "p" || e.key === "P") {
+        document.getElementById("start").style.display = "block";
+        window.WEM.app.audio && window.WEM.app.audio.play();
+      }
+    });
+  }).catch(function(e){
+    window.__bootError = String(e && e.stack || e);
+    console.error(e);
+  });
+})();
+</script>
+</body>
+</html>
