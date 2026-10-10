@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>engine test</title>
+<style>
+  html,body{margin:0;padding:0;background:#000;overflow:hidden;width:100%;height:100%}
+  #gl{display:block;width:100vw;height:100vh}
+</style>
+</head>
+<body>
+<canvas id="gl" width="1920" height="1080"></canvas>
+<script src="../src/00_core.js"></script>
+<script src="../src/10_render.js"></script>
+<script src="../src/20_hud.js"></script>
+<script src="../src/30_data.js"></script>
+<script src="../src/40_main.js"></script>
+<script>
+(function(){
+  var WEM = window.WEM; WEM.assetBase = "../assets/analysis/"; WEM.audioBase = "../assets/audio/";
+  var C = WEM.core, M4 = C.M4, COL = WEM.HUD.COL;
+  var geo = C.geo;
+  var cube = geo.box(1,1,1), ico = geo.ico(2);
+  WEM.defineSection({
+    id:"t", name:"test",
+    init:function(ctx){ this.rnd = C.rng(7); },
+    enter:function(ctx){
+      if(ctx.index % 2 === 0) ctx.cam.reset2d(); else ctx.cam.reset3d(6);
+      ctx.fx.mood(ctx.index%3===1?[0.15,0.28,0.85]:[0.9,0.2,0.15], [0.02,0.05,0.12], (ctx.index%3)*0.5);
+    },
+    draw2d:function(ctx){
+      var hud = ctx.hud, t = ctx.t;
+      hud.T(60, 70, "ENGINE TEST // section "+ctx.index+"  t="+t.toFixed(2), {size:26, color:COL.white});
+      hud.win(60, 110, 470, 190, "terminal.sys", {});
+      hud.code(76, 162, "def execute(world):", "python", {size:15});
+      hud.code(76, 186, '    return world.evolve(dt=1/60)  # 130 BPM', "python", {size:15});
+      hud.code(76, 210, "    SELECT * FROM universe WHERE id = 0;", "sql", {size:15});
+      hud.formula(76, 262, "\\frac{i\\hbar \\partial \\psi}{\\partial t} = \\hat{H}\\psi", {size:30, color:COL.cyan});
+      var p = hud.panel(0); p.clear();
+      hud.T(10, 24, "PANEL 0", {size:14, color:COL.gold, ctx:p.ctx});
+      var bytes = new Uint8Array(256); for(var i=0;i<256;i++) bytes[i]=(i*37)&255;
+      hud.hexDump(10, 52, bytes, 6, {ctx:p.ctx, base:0});
+      var p2 = hud.panel(5); p2.clear("rgba(20,30,60,0.75)");
+      hud.T(10, 24, "PANEL 5", {size:14, color:COL.green, ctx:p2.ctx});
+      hud.bar(10, 40, 220, 12, (t*0.3)%1, {ctx:p2.ctx, fill:COL.amber});
+      hud.formula(10, 110, "E = mc^2", {size:34, color:COL.white, ctx:p2.ctx});
+      hud.formula(10, 170, "\\nabla \\times B = \\mu_0 J", {size:20, color:COL.green, ctx:p2.ctx});
+      hud.formula(10, 215, "\\sqrt{a^2+b^2}", {size:22, color:COL.amber, ctx:p2.ctx});
+      hud.T(60, 1030, "beat "+ctx.beat.index+"  bar "+ctx.beat.bar+"  pulse "+ctx.beat.pulse.toFixed(2)+
+             "  rms "+ctx.rms.toFixed(2), {size:16, color:COL.dim});
+    },
+    draw3d:function(ctx){
+      var g = ctx.gfx, t = ctx.t, beat = ctx.beat;
+      var lines = new Float32Array(64*12);
+      for(var i=0;i<64;i++){
+        var a = i/64*Math.PI*2 + t*0.2, r = 3 + 0.4*Math.sin(t+i*0.3);
+        lines[i*12]   = Math.cos(a)*r; lines[i*12+1] = -1.5; lines[i*12+2] = Math.sin(a)*r;
+        lines[i*12+3] = Math.cos(a+0.28)*r; lines[i*12+4] = -1.5+0.6*Math.sin(t+i); lines[i*12+5] = Math.sin(a+0.28)*r;
+        lines[i*12+6] = 0.35; lines[i*12+7] = 0.9; lines[i*12+8] = 1.0; lines[i*12+9] = 0.9;
+        lines[i*12+10] = 2.5; lines[i*12+11] = 2.5;
+      }
+      g.lines(lines, {add:true, glow:0.6});
+      var rot = M4.mul(M4.rotY(t*0.7), M4.rotX(t*0.31));
+      var model = M4.compose([Math.sin(t*0.5)*1.2, 0.6+beat.pulse*0.25, 0], rot, 1.6+beat.pulse*0.12);
+      g.solid(ico, model, {color:[0.93,0.95,0.98], rim:0.7, alpha:1});
+      g.wire(cube, M4.compose([0,0,0], M4.rotY(-t*0.4), 3.4), {color:[0.75,0.85,0.95], alpha:0.5, width:1.4});
+      var pts = new Float32Array(600*8);
+      for(var k=0;k<600;k++){
+        var s = 0.6 + 0.4*Math.sin(t*2+k);
+        pts[k*8] = Math.sin(k*1.7+t)*4; pts[k*8+1] = Math.cos(k*2.3+t*0.7)*3; pts[k*8+2] = Math.sin(k*0.9-t*0.4)*4;
+        pts[k*8+3] = 3+6*s;
+        pts[k*8+4] = 0.6; pts[k*8+5] = 0.85; pts[k*8+6] = 1.0; pts[k*8+7] = 0.55;
+      }
+      g.points(pts, {add:true});
+      // 3D panel quads sampling cells of the hud atlas
+      var q = new Float32Array(24*2);
+      var pa = ctx.hud.panel(0), pb = ctx.hud.panel(6);
+      C.packQuad(q, 0, M4.mul(M4.compose([-2.7,1.2,1.8], M4.rotY(0.55), 1), M4.scale(1.7,1.7,1)), [pa.u0,pa.v0,pa.u1,pa.v1], [1,1,1,1]);
+      C.packQuad(q, 24, M4.mul(M4.compose([2.6,-0.5,1.4], M4.rotY(-0.45), 1), M4.scale(1.7,1.7,1)), [pb.u0,pb.v0,pb.u1,pb.v1], [1,1,1,1]);
+      g.quads(q, ctx.hud.tPan.tex, {});
+    }
+  });
+  for(var i=0;i<14;i++) WEM.sections.push(WEM.sections[0]);
+  WEM.boot({mode: new URLSearchParams(location.search).has("play") ? "play":"render"})
+    .then(function(){ window.__booted = true; })
+    .catch(function(e){ window.__bootError = String(e && e.stack || e); console.error(e); });
+})();
+</script>
+</body></html>

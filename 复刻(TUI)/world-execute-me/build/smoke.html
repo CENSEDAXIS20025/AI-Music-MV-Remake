@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>gpu smoke</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style></head>
+<body><canvas id="c" width="320" height="180"></canvas>
+<script>
+const c = document.getElementById('c');
+const gl = c.getContext('webgl2', {antialias:true, preserveDrawingBuffer:true});
+window.__info = (() => {
+  if (!gl) return { ok:false, reason:'no webgl2' };
+  const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+  const exts = gl.getSupportedExtensions();
+  return {
+    ok: true,
+    version: gl.getParameter(gl.VERSION),
+    vendor: dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR),
+    renderer: dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
+    colorBufferFloat: !!gl.getExtension('EXT_color_buffer_float'),
+    floatBlend: !!gl.getExtension('EXT_float_blend'),
+    maxTex: gl.getParameter(gl.MAX_TEXTURE_SIZE),
+    maxSamples: gl.getParameter(gl.MAX_SAMPLES),
+    webcodecs: typeof VideoEncoder !== 'undefined',
+    h264: typeof VideoEncoder !== 'undefined' ? 'unknown' : 'none',
+  };
+})();
+// fill with a gradient triangle to prove actual rasterization
+if (gl) {
+  const vs = `#version 300 es
+  in vec2 p; out vec2 uv; void main(){ uv=p*0.5+0.5; gl_Position=vec4(p,0.,1.); }`;
+  const fs = `#version 300 es
+  precision highp float; in vec2 uv; out vec4 o;
+  void main(){ o=vec4(uv.x, uv.y, 0.5+0.5*sin(uv.x*40.0), 1.0); }`;
+  const mk = (t, s) => { const sh = gl.createShader(t); gl.shaderSource(sh, s); gl.compileShader(sh); if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh)); return sh; };
+  const pr = gl.createProgram(); gl.attachShader(pr, mk(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, mk(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(pr));
+  gl.useProgram(pr);
+  const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(pr,'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  gl.clearColor(0,0,0,1); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES,0,3); gl.finish();
+  window.__px = Array.from(gl.readPixels ? (()=>{ const px=new Uint8Array(4); gl.readPixels(160,90,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px); return px; })() : []);
+}
+window.__ready = true;
+</script></body></html>
