@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" class="wem-light">
+<head>
+<meta charset="utf-8">
+<title>world.search(you); — THE INDEX OF YOU</title>
+<script>window.WEM_THEME = "light";</script>
+<script>
+  // Light entry. window.WEM_THEME is baked in before the engine boots so the
+  // composite runs the paper inversion from frame one. ?theme=dark overrides
+  // it, which is how the same build can be inspected in the other look.
+  (function () {
+    var light = window.WEM_THEME === "light";
+    try {
+      var q = new URLSearchParams(location.search);
+      if (q.has("theme")) light = q.get("theme") === "light";
+    } catch (e) { }
+    window.WEM_THEME = light ? "light" : "dark";
+    document.documentElement.className = light ? "wem-light" : "";
+  })();
+</script>
+<style>
+  html,body{margin:0;padding:0;background:#000;overflow:hidden;width:100%;height:100%;
+            font-family:"Cascadia Mono",Consolas,monospace;color:#cfd6de}
+  #gl{display:block;width:100vw;height:100vh}
+  #start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+         background:rgba(8,10,14,.90);border:1px solid rgba(255,154,77,.6);color:#eef2f6;
+         padding:24px 38px;font:600 16px/1.6 "Cascadia Mono",Consolas,monospace;cursor:pointer;
+         letter-spacing:1px;text-align:center;z-index:9}
+  #start:hover{border-color:#ffd166;color:#ffd166}
+  #start b{display:block;font-size:19px;letter-spacing:2px;margin-bottom:10px;color:#ffd166}
+  #start small{display:block;margin-top:10px;color:#7f8892;font-weight:400;letter-spacing:0;font-size:12px}
+  /* ---- paper theme: the same chrome printed instead of lit ---- */
+  html.wem-light,html.wem-light body{background:#f1efe8;color:#2b323a}
+  html.wem-light #start{background:rgba(252,251,247,.95);border-color:rgba(0,120,150,.55);color:#1b2128;
+                        box-shadow:0 8px 30px rgba(40,44,50,.16)}
+  html.wem-light #start:hover{border-color:#a8651a;color:#a8651a}
+  html.wem-light #start b{color:#a8651a}
+  html.wem-light #start small{color:#6d757e}
+</style>
+</head>
+<body>
+<canvas id="gl" width="1920" height="1080"></canvas>
+<button id="start"><b>world.search(you);</b>▶ START PLAYBACK<small>Mili — world.search (you) ;<br>THE INDEX OF YOU · 1945 → 2026 · paper edition<br>audio + visuals rendered live in your browser</small></button>
+
+<script src="src/00_core.js"></script>
+<script src="src/10_render.js"></script>
+<script src="src/20_hud.js"></script>
+<script src="src/25_viz.js"></script>
+<script src="src/26_lab.js"></script>
+<script src="src/27_model.js"></script>
+<script src="src/30_data.js"></script>
+<script src="src/50_audiobar.js"></script>
+<script src="src/40_main.js"></script>
+<script src="src/60_tui.js"></script>
+<script src="src/62_lyric.js"></script>
+<script src="src/28_index.js"></script>
+<script src="src/sections/a_01_06.js"></script>
+<script src="src/sections/b_07_12.js"></script>
+<script src="src/sections/c_13_17.js"></script>
+<script src="src/sections/d_18_22.js"></script>
+<script>
+(function(){
+  var play = !new URLSearchParams(location.search).has("render");
+  window.WEM_AB_GAIN = 0.80;
+  window.WEM_AB_EXPO = 0.50;
+  window.WEM_AB_MUL = 1.55;
+  window.WEM_BANDS_GAIN = 0.30;
+  window.WEM.boot({ mode: play ? "play" : "render" }).then(function(){
+    window.__booted = true;
+    if (!play) { document.getElementById("start").style.display = "none"; }
+    document.addEventListener("keydown", function(e){
+      if (e.key === "p" || e.key === "P") {
+        document.getElementById("start").style.display = "block";
+        window.WEM.app.audio && window.WEM.app.audio.play();
+      }
+    });
+  }).catch(function(e){
+    window.__bootError = String(e && e.stack || e);
+    console.error(e);
+  });
+})();
+</script>
+</body>
+</html>
