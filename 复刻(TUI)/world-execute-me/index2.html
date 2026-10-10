@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>world.execute(me); —second storyboard</title>
+<style>
+  html,body{margin:0;padding:0;background:#000;overflow:hidden;width:100%;height:100%;
+            font-family:"Cascadia Mono",Consolas,monospace;color:#cfd6de}
+  #gl{display:block;width:100vw;height:100vh}
+</style>
+</head>
+<body>
+<canvas id="gl" width="1920" height="1080"></canvas>
+
+<script src="src/00_core.js"></script>
+<script src="src/10_render.js"></script>
+<script src="src/20_hud.js"></script>
+<script src="src/25_viz.js"></script>
+<script src="src/26_lab.js"></script>
+<script src="src/30_data.js"></script>
+<script src="src/50_audiobar.js"></script>
+<script src="src/40_main.js"></script>
+<script src="src/sections2/a_01_05.js"></script>
+<script src="src/sections2/a2_04_05.js"></script>
+<script src="src/sections2/b_06_10.js"></script>
+<script src="src/sections2/c_11_15.js"></script>
+<script>
+(function(){
+  window.WEM.boot({ mode: "render" }).then(function(){
+    window.__booted = true;
+  }).catch(function(e){
+    window.__bootError = String(e && e.stack || e);
+    console.error(e);
+  });
+})();
+</script>
+</body>
+</html>
